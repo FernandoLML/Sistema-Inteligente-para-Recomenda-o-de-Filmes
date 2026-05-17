@@ -61,27 +61,42 @@ export default function PageAnalise() {
   const [erro, setErro] = useState("");
 
   const handleAnalyze = async () => {
-    if (!texto.trim()) return;
+    if (!texto.trim()) {
+      setErro("Por favor, digite ou selecione um exemplo de texto.");
+      return;
+    }
     setLoading(true);
     setErro("");
+    setResultado(null);
     try {
+      console.log("Enviando análise:", texto.substring(0, 50) + "...");
       const r = await analyzeText(texto);
+      console.log("Resposta recebida:", r);
       setResultado(r);
     } catch (e) {
-      setErro("Erro ao conectar com a API. Verifique se o backend está rodando.");
+      console.error("Erro completo:", e);
+      setErro(`Erro ao conectar com a API: ${e.message || "Verifique se o backend está rodando."}`);
     }
     setLoading(false);
   };
 
   const handleMetrics = async () => {
     setLoadingMetrics(true);
+    setErro("");
     try {
       const m = await getMetrics();
       setMetricas(m);
-    } catch {
-      setErro("Erro ao carregar métricas.");
+    } catch (e) {
+      console.error("Erro ao carregar métricas:", e);
+      setErro(`Erro ao carregar métricas: ${e.message}`);
     }
     setLoadingMetrics(false);
+  };
+
+  const handleSelectExample = (ex) => {
+    setTexto(ex);
+    setResultado(null);
+    setErro("");
   };
 
   const sentColor = { positive: "var(--positive)", negative: "var(--negative)", neutral: "var(--neutral)" };
@@ -110,12 +125,18 @@ export default function PageAnalise() {
           </button>
           <span style={{ fontSize: 13, color: "var(--text2)" }}>ou use um exemplo:</span>
           {EXEMPLOS.map((ex, i) => (
-            <button key={i} className="btn-secondary" style={{ fontSize: 12 }} onClick={() => setTexto(ex)}>
+            <button 
+              key={i} 
+              className="btn-secondary" 
+              style={{ fontSize: 12 }} 
+              onClick={() => handleSelectExample(ex)}
+              disabled={loading}
+            >
               Exemplo {i + 1}
             </button>
           ))}
         </div>
-        {erro && <p style={{ marginTop: "1rem", color: "var(--negative)", fontSize: 13 }}>{erro}</p>}
+        {erro && <p style={{ marginTop: "1rem", color: "var(--negative)", fontSize: 13 }}>⚠️ {erro}</p>}
       </div>
 
       {resultado && (
@@ -153,7 +174,7 @@ export default function PageAnalise() {
         <div className="card">
           {metricas.sintetico && (
             <p style={{ fontSize: 12, color: "var(--accent)", marginBottom: "1rem" }}>
-              Modelo treinado com dados sintéticos (coloque IMDB_Dataset.csv em /data para usar o dataset real)
+              ℹ️ Modelo treinado com dados sintéticos (coloque IMDB_Dataset.csv em /data para usar o dataset real)
             </p>
           )}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1rem", marginBottom: "1.5rem" }}>

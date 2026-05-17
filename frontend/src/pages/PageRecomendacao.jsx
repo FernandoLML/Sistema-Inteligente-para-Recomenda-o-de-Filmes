@@ -26,11 +26,15 @@ export default function PageRecomendacao() {
   const handleRun = async () => {
     setLoading(true);
     setErro("");
+    setResultado(null);
     try {
+      console.log("Executando recomendação com", filmes.length, "filmes, n_recomendados:", nRec, "n_geracoes:", nGen);
       const r = await recommend(filmes, nRec, nGen);
+      console.log("Resultado recomendação:", r);
       setResultado(r);
-    } catch {
-      setErro("Erro ao conectar com a API. Verifique se o backend está rodando.");
+    } catch (e) {
+      console.error("Erro ao gerar recomendações:", e);
+      setErro(`Erro ao conectar com a API: ${e.message}`);
     }
     setLoading(false);
   };
@@ -71,7 +75,7 @@ export default function PageRecomendacao() {
         <button className="btn-primary" onClick={handleRun} disabled={loading}>
           {loading ? <><span className="loading-dot" style={{ marginRight: 8 }} />Executando pipeline IA...</> : "Executar sistema inteligente"}
         </button>
-        {erro && <p style={{ marginTop: "1rem", color: "var(--negative)", fontSize: 13 }}>{erro}</p>}
+        {erro && <p style={{ marginTop: "1rem", color: "var(--negative)", fontSize: 13 }}>⚠️ {erro}</p>}
       </div>
 
       {resultado && (
