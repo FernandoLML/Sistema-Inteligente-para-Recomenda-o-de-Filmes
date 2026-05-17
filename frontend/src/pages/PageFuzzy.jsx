@@ -51,11 +51,15 @@ export default function PageFuzzy() {
   const handleCalc = async () => {
     setLoading(true);
     setErro("");
+    setResultado(null);
     try {
+      console.log("Calculando fuzzy com prob_positivo:", probPos, "nota:", nota);
       const r = await fuzzyInference(probPos, nota);
+      console.log("Resultado fuzzy:", r);
       setResultado(r);
-    } catch {
-      setErro("Erro ao conectar com a API.");
+    } catch (e) {
+      console.error("Erro ao calcular fuzzy:", e);
+      setErro(`Erro ao conectar com a API: ${e.message}`);
     }
     setLoading(false);
   };
@@ -87,7 +91,7 @@ export default function PageFuzzy() {
         <button className="btn-primary" style={{ marginTop: "1.5rem" }} onClick={handleCalc} disabled={loading}>
           {loading ? "Calculando..." : "Calcular score fuzzy"}
         </button>
-        {erro && <p style={{ marginTop: "1rem", color: "var(--negative)", fontSize: 13 }}>{erro}</p>}
+        {erro && <p style={{ marginTop: "1rem", color: "var(--negative)", fontSize: 13 }}>⚠️ {erro}</p>}
       </div>
 
       {resultado && (

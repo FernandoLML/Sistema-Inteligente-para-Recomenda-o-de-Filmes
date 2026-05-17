@@ -1,6 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from app.core.fuzzy_system import calcular_score_fuzzy
+import traceback
 
 router = APIRouter()
 
@@ -13,4 +14,10 @@ class FuzzyRequest(BaseModel):
 @router.post("/fuzzy")
 def fuzzy_inference(req: FuzzyRequest):
     """Calcula o score de recomendação via inferência fuzzy Mamdani."""
-    return calcular_score_fuzzy(req.prob_positivo, req.nota_filme)
+    try:
+        result = calcular_score_fuzzy(req.prob_positivo, req.nota_filme)
+        return result
+    except Exception as e:
+        print(f"Erro ao processar fuzzy: {str(e)}")
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"Erro ao processar inferência fuzzy: {str(e)}")
