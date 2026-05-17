@@ -17,22 +17,16 @@ from nltk.tokenize import word_tokenize
 import nltk
 
 # Ensure NLTK data is available
-try:
-    nltk.data.find('tokenizers/punkt')
-except LookupError:
-    nltk.download('punkt', quiet=True)
-try:
-    nltk.data.find('tokenizers/punkt_tab')
-except LookupError:
-    nltk.download('punkt_tab', quiet=True)
-try:
-    nltk.data.find('corpora/stopwords')
-except LookupError:
-    nltk.download('stopwords', quiet=True)
-try:
-    nltk.data.find('corpora/wordnet')
-except LookupError:
-    nltk.download('wordnet', quiet=True)
+for resource, path in [
+    ('punkt',     'tokenizers/punkt'),
+    ('punkt_tab', 'tokenizers/punkt_tab'),
+    ('stopwords', 'corpora/stopwords'),
+    ('wordnet',   'corpora/wordnet'),
+]:
+    try:
+        nltk.data.find(path)
+    except (LookupError, OSError):
+        nltk.download(resource, quiet=True)
 
 MODEL_PATH = "/app/data/modelo_nb.pkl"
 VECTORIZER_PATH = "/app/data/vectorizer.pkl"
