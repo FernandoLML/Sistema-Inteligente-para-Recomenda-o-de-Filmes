@@ -5,9 +5,14 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-FROM node:20-alpine
-WORKDIR /app
-RUN npm install -g serve
-COPY --from=builder /app/dist ./dist
+# Estágio 2: Servidor Web com Nginx
+FROM nginx:alpine
+# Remove a configuração padrão do Nginx
+RUN rm /etc/nginx/conf.d/default.conf
+# Copia nossa configuração personalizada para a porta 3000 e proxy
+COPY nginx.conf /etc/nginx/conf.d/
+# Copia os arquivos compilados do Vite do estágio anterior
+COPY --from=builder /app/dist /usr/share/nginx/html
+
 EXPOSE 3000
-CMD ["serve", "-s", "dist", "-l", "3000"]
+CMD ["nginx", "-g", "daemon off;"]
