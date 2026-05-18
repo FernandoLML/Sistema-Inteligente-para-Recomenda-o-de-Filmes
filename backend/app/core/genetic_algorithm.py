@@ -52,6 +52,11 @@ def executar_ga(filmes: List[dict], n_recomendados: int = 5,
     toolbox.register("select", tools.selTournament, tournsize=3)
 
     pop = toolbox.population(n=tamanho_pop)
+
+    fitnesses = list(map(toolbox.evaluate, pop))
+    for ind, fit in zip(pop, fitnesses):
+        ind.fitness.values = fit
+    
     hof = tools.HallOfFame(1)
     stats = tools.Statistics(lambda ind: ind.fitness.values[0])
     stats.register("max", np.max)
